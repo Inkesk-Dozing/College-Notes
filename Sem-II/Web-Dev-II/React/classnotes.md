@@ -7,3 +7,4 @@ virtual dom 1 is copy of Real DOm , Virtual dom 2 will manage the changes
 
 when virtual dom 1 changes into Real DOM 1 then it is called as RECONCILIATION.
 
+<> = called React fragement for multiple line of code.
