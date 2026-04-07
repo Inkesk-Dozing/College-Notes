@@ -24,7 +24,28 @@ export function About() {
 }
 ```
 
-5.
+5. Lifecycle in other components:
+- Class component uses life cycle methods to perform.
+- Life cycle methods have unnecessary boilerplate code so the application gets complex and hard to manage.
+- Lifecycle Methods:
+    - Mount 
+    - Update
+    - Unmount
+- So thats why we shifted to functional components.
+
+6. We cannot re-render normal variable in JSX.
+
+7. Inside onclick or any event just write the function name, no need of ().
+
+# HOOKS
+
+- Hooks are function's, predefined function's 
+- Hooks allows to use state and other features without writing a class.
+> There are 2 rules ro use Hooks:-  
+>1. Only call hooks at the top level.  
+>2. Only call hooks from React function components or custom hooks.
+
+
 
 
 <!-- # React + Vite

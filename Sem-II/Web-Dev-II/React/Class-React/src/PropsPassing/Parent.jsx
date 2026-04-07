@@ -2,7 +2,7 @@ import React from 'react';
 import Child from './Child';
 
 const Parent = () => {
-    const fullName = "Krishyangi Dixit";
+    const fullName = "Harsh Dev Jha";
 
     function Alert() {
         alert("Button Clicked")

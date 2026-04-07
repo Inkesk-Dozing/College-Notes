@@ -3,6 +3,8 @@ import Navbar from "./components/Navbar";
 import About, { add, subtract } from "./About";
 import "./App.css";
 import Parent from "./PropsPassing/Parent";
+import TernaryComp from "./ConceptComp/TernaryComp";
+import UseStateOne from "./Hooks/UseStateOne";
 
 const App = () => {
   console.log(add(2, 3))
@@ -16,6 +18,8 @@ const App = () => {
       <p>Addition of {add(10, 20)}</p>
       <p>Subtraction of {subtract(10, 20)}</p>
       <p><Parent /></p>
+      <TernaryComp />
+      <UseStateOne />
     </>
   );
 };
