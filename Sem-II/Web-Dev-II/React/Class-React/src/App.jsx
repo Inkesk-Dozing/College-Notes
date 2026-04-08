@@ -5,6 +5,7 @@ import "./App.css";
 import Parent from "./PropsPassing/Parent";
 import TernaryComp from "./ConceptComp/TernaryComp";
 import UseStateOne from "./Hooks/UseStateOne";
+import MultiCounter from "./Hooks/MultiCounter";
 
 const App = () => {
   console.log(add(2, 3))
@@ -20,6 +21,9 @@ const App = () => {
       <p><Parent /></p>
       <TernaryComp />
       <UseStateOne />
+      <hr />
+      <MultiCounter />
+      
     </>
   );
 };
