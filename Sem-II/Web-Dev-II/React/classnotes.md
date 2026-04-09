@@ -1,7 +1,7 @@
 
 [Notes](https://sp-krmu-source.github.io/React-Notes/#class-components)
 
-2 virtual dom 
+2 virtual dom /
 
 virtual dom 1 and virtual dom 2 when gets compared to each other according to users change 
 is knows as DIFFING ALGORITHM

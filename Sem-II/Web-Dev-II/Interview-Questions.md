@@ -87,7 +87,7 @@ Q20. Explain Async and Await.Why is it more efficient and readable than Promise 
 
 
 
-Guess the Output and Explain the Reason in Details (Concepts to cover:callstack, event loop, micro task and macro task queue) 
+<!-- Guess the Output and Explain the Reason in Details (Concepts to cover:callstack, event loop, micro task and macro task queue) 
 
 Q21. 
 console.log("A");
@@ -154,7 +154,7 @@ new Promise((resolve) => {
   console.log("D");
 });
 
-console.log("E");
+console.log("E"); -->
 
 
 
@@ -162,6 +162,19 @@ console.log("E");
 
 
 27. What is virtual DOM 
+
+28. What is single page application.The difference between SPA and MPA (multi page application).
+
+29. Explain one way data binding (inn REACT).
+
+30. How JSX works in REACT, what is the need of babel and what is it.
+
+31. Explain Lifecycle methods and its disadvantages.
+
+32. How to tackle lifecycle methods by using 'useEffect' hook.
+
+33. 
+
 
 <!-- # Questions
 
