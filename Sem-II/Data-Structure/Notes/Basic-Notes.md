@@ -5,8 +5,10 @@
 ## Quick Sort Detailed Implementation (Python)
 ```python
 def partition(arr, low, high):
-    # Choose the rightmost element as pivot
+    # **Pivot**: Reference value to partition around - smaller left, larger right.
+    # Rightmost chosen here (simple Lomuto partition scheme)
     pivot = arr[high]
+
     # Index of smaller element (initially shifted one position left)
     i = low - 1
     
@@ -73,8 +75,10 @@ void swap(int* a, int* b) {
 }
 
 int partition(int arr[], int low, int high) {
-    // Select last element as pivot (common choice for simplicity)
+    // **Pivot**: Reference value used to partition array. Elements < pivot go left, > go right.
+    // Here, last element chosen as pivot (simple, but random/middle better for worst-case avoidance)
     int pivot = arr[high];
+
     // 'i' tracks the correct position for elements <= pivot
     int i = low - 1;
     
