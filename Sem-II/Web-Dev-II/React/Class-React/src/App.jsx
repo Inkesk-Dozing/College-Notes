@@ -6,13 +6,18 @@ import Parent from "./PropsPassing/Parent";
 import TernaryComp from "./ConceptComp/TernaryComp";
 import UseStateOne from "./Hooks/UseStateOne";
 import MultiCounter from "./Hooks/MultiCounter";
+import Password from "./Hooks/ShowPassword";
+import DarkLightTheme from "./Hooks/DarkLightTheme";
+import Form from "./Hooks/FormHandling";
 
 const App = () => {
   console.log(add(2, 3))
   console.log(subtract(2, 3))
   return (
+    
     <>
       <Navbar />
+      <DarkLightTheme/>
       <h1>Hello World</h1>
 
       <About />
@@ -21,11 +26,16 @@ const App = () => {
       <p><Parent /></p>
       <TernaryComp />
       <UseStateOne />
-      <hr />
-      <MultiCounter />
+      <hr /> 
       
+
+      
+      <MultiCounter />
+      <Password/>
+      <Form/>
+    
     </>
-  );
+    );
 };
 
 export default App;

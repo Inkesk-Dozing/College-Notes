@@ -173,7 +173,7 @@ console.log("E"); -->
 
 32. How to tackle lifecycle methods by using 'useEffect' hook.
 
-33. 
+33. Controlled Components and Uncontrolled Componenets
 
 
 <!-- # Questions
