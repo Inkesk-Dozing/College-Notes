@@ -173,7 +173,32 @@ console.log("E"); -->
 
 32. How to tackle lifecycle methods by using 'useEffect' hook.
 
-33. Controlled Components and Uncontrolled Componenets
+33. Controlled Components and Uncontrolled Components
+
+34. how to manage state in react by using useState hook.
+
+35. explain form handling in react
+  - manage usr input fields - user field - synthetic event e.target and prevent default 
+  - prevent default 
+  - submit the data
+
+36. How useEffect hooks replaced lifecycle method - component bound unbound did mount and such
+
+37. How to fetch API in useEffect *** important
+  - dependency array.
+
+38. Create 2 counter button when the first button is clikced then one popup will appear everytime when 
+    And when the second button is clicked then the no opoup should appear.
+
+39. How to perform routing , what is routing in react. Make 4 pages.
+
+40. dynamic routing and useParams
+
+41 Discuss the disadvantages of props drilling . how to overcome this in react .(context API)
+
+42. What is Context API and How to Pass the data in heirarchy by using context API.
+
+43. 
 
 
 <!-- # Questions

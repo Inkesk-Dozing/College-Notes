@@ -12,24 +12,26 @@ import Food from './components/Food'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 
+import Data from './Data.js'
+import Details from './components/Details'
+
 const App = () => {
     return (
-        <>
-            <BrowserRouter>
-                <Navbar />
+        <BrowserRouter>
+            <Navbar />
 
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/bollywood" element={<BollyWood />} />
-                    <Route path="/hollywood" element={<HollyWood />} />
-                    <Route path="/technology" element={<Technology />} />
-                    <Route path="/fitness" element={<Fitness />} />
-                    <Route path="/food" element={<Food />} />
-                </Routes>
-            </BrowserRouter>
-        </>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/bollywood" element={<BollyWood />} />
+                <Route path="/hollywood" element={<HollyWood />} />
+                <Route path="/technology" element={<Technology />} />
+                <Route path="/fitness" element={<Fitness />} />
+                <Route path="/food" element={<Food />} />
+                <Route path="/details/:id" element={<Details />} />
+            </Routes>
+        </BrowserRouter>
     )
 }
 
