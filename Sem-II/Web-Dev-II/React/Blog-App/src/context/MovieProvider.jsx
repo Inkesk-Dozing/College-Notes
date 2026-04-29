@@ -11,10 +11,10 @@ const MovieProvider = ({ children }) => {
     ]);
 
     return (
-        <MovieContext.Provider value=>
-{ children }
-    </MovieContext.Provider >
-  );
+        <MovieContext.Provider value={{ movies }}>
+            {children}
+        </MovieContext.Provider>
+    );
 }
 
 export default MovieProvider;

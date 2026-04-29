@@ -109,3 +109,21 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Light Mode */
+.light {
+  background-color: white;
+  color: black;
+}
+
+/* Dark Mode */
+.dark {
+  background-color: #121212;
+  color: white;
+}
+
+/* Smooth transition */
+body,
+div {
+  transition: all 0.3s ease;
+}

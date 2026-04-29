@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MovieContext } from './MovieProvider';
+import { MovieContext } from './Movieprovider.jsx';
 
 const MovieList = () => {
     const { movies } = useContext(MovieContext);
