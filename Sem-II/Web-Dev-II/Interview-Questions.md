@@ -198,7 +198,9 @@ console.log("E"); -->
 
 42. What is Context API and How to Pass the data in heirarchy by using context API.
 
-43. 
+43. what are custom hooks explain them with example.
+
+44. 
 
 
 <!-- # Questions
