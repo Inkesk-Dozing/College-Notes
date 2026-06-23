@@ -175,3 +175,208 @@ When the cache reaches memory limits, old or unused keys must be removed:
 A CDN is a geographically distributed network of proxy servers (Edge Nodes) designed to deliver content (images, video, JS, CSS, and dynamic APIs) to users from the closest physical location.
 *   **Static Caching**: Edge servers store static files cached from the origin server based on cache-control headers.
 *   **Dynamic Acceleration**: Minimizes round-trip times for API endpoints by optimizing network routing paths and TCP handshakes from the edge to the origin server.
+
+---
+
+## 5. API and Communication Protocols
+
+Communication interfaces allow client-server interactions and inter-service connectivity in distributed architectures.
+
+### 5.1 Communication Paradigms
+
+1.  **REST (Representational State Transfer)**:
+    *   Uses standard HTTP methods (`GET`, `POST`, `PUT`, `DELETE`).
+    *   Stateless, resource-oriented, typically returns JSON or XML.
+    *   *Pros*: Highly cacheable, universally supported, easy to understand.
+    *   *Cons*: Over-fetching (receiving unneeded fields) or under-fetching (requiring multiple API calls for related data).
+2.  **GraphQL**:
+    *   A query language for APIs. The client defines the exact shape of the response needed.
+    *   Uses a single endpoint (typically `/graphql` via `POST`).
+    *   *Pros*: Solves over/under-fetching; strongly typed schema.
+    *   *Cons*: Complex caching (cannot easily use HTTP GET cache headers); resource-intensive query validation.
+3.  **gRPC (Remote Procedure Call)**:
+    *   High-performance framework utilizing HTTP/2 transport and Protocol Buffers (protobuf) interface definition.
+    *   *Pros*: Compact binary serialization; bidirectional streaming; compile-time code generation for client/server stubs.
+    *   *Cons*: Limited browser support (requires gRPC-Web proxy); human-unreadable binary payloads make debugging complex.
+4.  **WebSockets**:
+    *   Provides full-duplex communication channels over a single, long-lived TCP connection.
+    *   Starts with an HTTP handshake, then upgrades to WebSocket protocol.
+    *   *Pros*: Low latency real-time events (real-time chat, stocks feeds).
+    *   *Cons*: Hard to scale load-balancer connections; requires connection state management.
+
+### 5.2 Protocol Comparison Matrix
+
+| Protocol | Transport | Serialization | Type System | Flow Model | Best For |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **REST** | HTTP/1.1 or 2 | JSON / XML | Weak / OpenAPIs | Request-Response | Public APIs, CRUD |
+| **GraphQL** | HTTP | JSON | Strong Schema | Request-Response / Subscriptions | Complex UI queries |
+| **gRPC** | HTTP/2 | Protobuf (Binary) | Strong Proto files | Bidirectional Streaming | Inter-microservice |
+| **WebSockets**| TCP | Text / Binary | Custom | Full-Duplex Events | Chat, Live Dashboards |
+
+---
+
+## 6. Messaging and Event Streaming
+
+Distributed systems use asynchronous communication to decouple services, absorb traffic spikes, and improve system availability.
+
+```mermaid
+graph LR
+    Publisher[Publisher Service] --> Broker[Message Broker / Log Store]
+    Broker --> ConsumerA[Consumer Service A]
+    Broker --> ConsumerB[Consumer Service B]
+```
+
+### 6.1 Message Brokers vs. Log-Based Event Streaming
+
+*   **Message Brokers (e.g., RabbitMQ, ActiveMQ)**:
+    *   Operate on transient storage. Messages are deleted immediately or shortly after they are successfully acknowledged by a consumer.
+    *   Supports complex routing keys, wildcards, and queues.
+    *   *Use Case*: Point-to-point task queues, asynchronous transactional emails, decoupled job distribution.
+*   **Log-Based Event Streaming (e.g., Apache Kafka, AWS Kinesis)**:
+    *   Operates as a persistent, append-only log on disk. Messages (events) are not deleted after consumption; they persist based on time or size limits.
+    *   Multiple consumers can read from different offsets of the same partition.
+    *   *Use Case*: Event sourcing, log aggregation, real-time analytics pipelines, system telemetry.
+
+### 6.2 Eventual Consistency and Idempotency
+*   **Eventual Consistency**: Decoupled database states across microservices synchronize asynchronously through event broadcasts, eventual convergence matching the source of truth.
+*   **Idempotency**: An operation is idempotent if it can be performed multiple times with the same output, leaving the system in the same state.
+    *   *Why it is critical*: Network failures can lead to duplicate message deliveries (At-Least-Once delivery model). Consumers must be idempotent (e.g., using unique transaction IDs or deduping databases) to avoid processing the same event twice.
+
+---
+
+## 7. System Resiliency
+
+Distributed systems must be designed for failure. Resiliency patterns prevent local failures from cascading across the entire cluster.
+
+### 7.1 Rate Limiting Algorithms
+Rate limiters restrict the number of requests a client can make in a given timeframe.
+
+1.  **Token Bucket**:
+    *   A bucket holds up to a maximum number of tokens. Tokens are added at a constant rate. Each request consumes a token. If the bucket is empty, the request is dropped.
+    *   *Pros*: Allows brief bursts of traffic; simple to configure.
+2.  **Leaking Bucket**:
+    *   Requests enter a queue (the bucket) and leave it at a constant, smooth rate. If the queue is full, incoming requests overflow and are rejected.
+    *   *Pros*: Guarantees a smooth output rate.
+    *   *Cons*: Bursts are delayed rather than processed immediately.
+3.  **Fixed Window Counter**:
+    *   Divides time into windows (e.g., 1 minute) and increments a counter for each window.
+    *   *Cons*: Traffic spikes at the window boundaries can allow up to twice the rate limit within a short period.
+4.  **Sliding Window Log**:
+    *   Tracks timestamp records for every single request in a sorted set (like Redis sorted sets). Invalid old timestamps are pruned.
+    *   *Pros*: Highly accurate.
+    *   *Cons*: High memory usage because every request timestamp must be stored in memory.
+5.  **Sliding Window Counter**:
+    *   Combines the fixed window algorithm with request rates of the previous window to estimate the current request rate dynamically. Low memory, highly performant approximation.
+
+### 7.2 Circuit Breaker Pattern
+Prevents a service from repeatedly trying to execute an operation that is highly likely to fail, saving network resources and thread pools.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Closed
+    Closed --> Open : Failure count threshold exceeded
+    Open --> HalfOpen : Cool-down timeout expires
+    HalfOpen --> Closed : Test requests succeed
+    HalfOpen --> Open : Test request fails
+```
+
+*   **Closed**: The circuit is healthy. Requests flow through normally.
+*   **Open**: The circuit is failing. Requests fail immediately (fail-fast) without hitting the backend service.
+*   **Half-Open**: A cool-down period expires; the system lets a limited number of test requests through. If they succeed, the circuit closes. If they fail, the circuit returns to the Open state.
+
+### 7.3 Retries, Exponential Backoff, and Jitter
+When a transient network error occurs, clients should retry, but retrying immediately can overload the target server (Thundering Herd Problem).
+*   **Exponential Backoff**: Multiplies the delay time between consecutive retries exponentially (e.g., 1s, 2s, 4s, 8s).
+*   **Jitter**: Adds a random variance to the retry delay to prevent all failing clients from retrying at the exact same millisecond.
+    $$\text{Sleep Time} = \text{random}(0, \min(\text{MaxBackoff}, \text{Base} \times 2^{\text{attempt}}))$$
+
+---
+
+## 8. Case Study: Distributed URL Shortener (TinyURL)
+
+Let us apply distributed system design concepts to build a scalable URL shortening service.
+
+### 8.1 Requirements
+*   **Functional**:
+    *   Given a long URL, generate a shorter alias.
+    *   Given a short URL, redirect to the original long URL with minimum latency.
+    *   Optionally specify a custom expiration date.
+*   **Non-Functional**:
+    *   Highly available (99.999% availability).
+    *   Low latency redirection (< 100ms response time).
+    *   Short URLs should be unpredictable.
+
+### 8.2 Back-of-the-Envelope Estimation
+*   **Traffic Scale**: 100 Million writes per month.
+*   **Read-to-Write Ratio**: 10:1 (Read-heavy service).
+*   **Write QPS**:
+    $$100,000,000 \text{ URLs} / (30 \text{ days} \times 24 \text{ hours} \times 3600 \text{ seconds}) \approx 40 \text{ writes/sec}$$
+*   **Read QPS**:
+    $$40 \times 10 = 400 \text{ reads/sec}$$
+*   **Storage Estimation**:
+    *   Assume 500 bytes per URL mapping record (long URL, short hash, user ID, expiration timestamp).
+    *   5-year storage requirements:
+        $$100,000,000 \text{ writes/month} \times 12 \text{ months} \times 5 \text{ years} \times 500 \text{ bytes} \approx 3 \text{ Terabytes}$$
+
+### 8.3 System APIs
+```http
+POST /api/v1/shorten
+Content-Type: application/json
+{
+  "longUrl": "https://example.com/very-long-path-name/info",
+  "customAlias": "my-custom-alias", (optional)
+  "expireAt": "2026-12-31T23:59:59Z" (optional)
+}
+
+Returns:
+{
+  "shortUrl": "https://tiny.ly/a7B9cd"
+}
+```
+
+```http
+GET /:shortKey -> HTTP 302 Redirect (Location: longUrl)
+```
+
+### 8.4 High-Level Architecture
+
+```mermaid
+graph TD
+    Client[Client Browser] --> LB[Load Balancer]
+    LB --> Web[App Servers]
+    Web --> Cache[Redis Cache]
+    Web --> DB[(NoSQL Database)]
+    Web --> KGS[Key Generation Service]
+```
+
+### 8.5 Engineering the Key Generation Service (KGS)
+To create a short URL, we need to convert a unique ID to Base62 (characters `[a-z, A-Z, 0-9]`). A 7-character Base62 string provides:
+$$62^7 \approx 3.5 \text{ Trillion unique keys}$$
+This is more than sufficient for our 5-year storage target.
+
+*   **Hashing Collision Problem**: Using MD5/SHA256 of the long URL and truncating to 7 characters causes hash collisions.
+*   **KGS Solution**:
+    *   A dedicated, lightweight microservice that pre-generates unique 7-character keys and stores them in a Database table (`KeyStore`).
+    *   App servers query the KGS to get a new key whenever a write occurs.
+    *   To prevent KGS from being a bottleneck, App Servers fetch keys in batches (e.g., 2,000 keys at a time) and buffer them in local memory.
+    *   *Concurrency Handling*: Active keys in memory are marked as "allocated" in KGS db to prevent multi-node duplication.
+
+### 8.6 Data Model & Storage Choice
+Since we store trillions of independent, unstructured records with simple Key-Value queries (Mapping `shortKey` $\to$ `longUrl`), a relational database (SQL) is not strictly necessary.
+*   **NoSQL choice**: Cassandra or DynamoDB offers horizontal scale, low lookup latency, and partition-friendly structures.
+*   **Database Schema (DynamoDB / Cassandra style)**:
+    *   Primary Partition Key: `shortKey` (String)
+    *   Attributes: `longUrl` (String), `userId` (String), `createdAt` (Timestamp), `expireAt` (Timestamp)
+
+### 8.7 Caching & Load Balancing
+*   **Caching**: Store the top 20% most active redirect mappings in a Redis Cluster (80/20 Pareto rule). When redirections occur, check Redis first.
+*   **Load Balancing**: Use Layer 7 Load Balancer to route based on path (`/api/v1/shorten` routes to write-optimized servers; `/*` short-keys routes to read-optimized redirect servers).
+
+---
+
+## 9. References and Key Literature
+
+1.  **Kleppmann, M.** (2017). *Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems*. O'Reilly Media.
+2.  **Xu, A.** (2020). *System Design Interview – An insider's guide*. Volume 1 & 2.
+3.  **Martin, D.** (2023). *The System Design Primer*. [GitHub Repository](https://github.com/donnemartin/system-design-primer).
+4.  **Google Engineering**. (2016). *Site Reliability Engineering: How Google Runs Production Systems*. O'Reilly Media.
